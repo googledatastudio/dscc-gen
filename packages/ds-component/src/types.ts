@@ -44,6 +44,7 @@ export interface Config {
    * The data config defined for the component.
    */
   data: ConfigData[];
+  colorMap: ColorMap[];
   /**
    * The style elements required and supported by the component.
    */
@@ -78,6 +79,15 @@ export interface Field {
 export enum ConceptType {
   METRIC = 'METRIC',
   DIMENSION = 'DIMENSION',
+}
+
+export interface ColorInfo {
+  id: string;
+  color: string;
+}
+
+export interface ColorMap {
+ colors: ColorInfo[];
 }
 
 export interface DSDateRange {

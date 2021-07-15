@@ -431,6 +431,40 @@ const testMessage = (
   };
 };
 
+test('subscribeToData works with colorMap', () => {
+  window.history.replaceState({}, 'Test Title', '/test?dscId=my-id');
+  const message = testMessage(1, 1, 1, 0);
+  const addEventListenerMock = jest.fn((event, cb) => {
+    if (event === 'message') {
+      cb({data: message});
+    } else {
+      throw new Error('unsupported event type for testing');
+    }
+  });
+
+  const postMessageMock = jest.fn();
+  const removeEventListenerMock = jest.fn();
+
+  window.addEventListener = addEventListenerMock;
+  window.parent.postMessage = postMessageMock;
+  window.removeEventListener = removeEventListenerMock;
+  // This is a hack since we can't do `window.frameElement = {...}`
+  Object.defineProperty(window, 'frameElement', {
+    get: () => ({
+      getAttribute: () => '123',
+    }),
+  });
+
+  const unSub = sut.subscribeToData(
+    (actual: sut.TableFormat) => {
+      expect(actual).toEqual(sut.tableTransform(message));
+    },
+    {transform: sut.tableTransform}
+  );
+  unSub();
+  expect(removeEventListenerMock.mock.calls.length).toBeGreaterThan(0);
+});
+
 test('subscribeToData works', () => {
   window.history.replaceState({}, 'Test Title', '/test?dscId=my-id');
   const message = testMessage(1, 1, 1, 0);
